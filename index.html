@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilsX — Enterprise Financial & Wealth Management</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            950: '#020d08',
+                            900: '#051b12',
+                            800: '#0a2e1f',
+                            700: '#0f422b',
+                            600: '#155837',
+                            500: '#1a7043',
+                            400: '#208b50',
+                            300: '#2ea85f',
+                            200: '#4cc97a',
+                        },
+                        gold: {
+                            50: '#fffdf5',
+                            100: '#fff9e0',
+                            200: '#ffefb3',
+                            300: '#ffe380',
+                            400: '#ffd54d',
+                            500: '#d4a72c',
+                            600: '#b8891f',
+                            700: '#946c16',
+                            800: '#705010',
+                            900: '#4d350a',
+                        },
+                        navy: {
+                            950: '#0a0e17',
+                            900: '#0f1522',
+                            800: '#151d30',
+                            700: '#1b2640',
+                            600: '#223050',
+                            500: '#2a3b60',
+                            400: '#334770',
+                        },
+                        surface: {
+                            dark: '#0f1923',
+                            darker: '#0a121a',
+                            card: '#141e2b',
+                            border: '#1e2d3d',
+                            hover: '#1a2738',
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --scrollbar-thumb: #2a3b60;
+            --scrollbar-track: #0f1923;
+        }
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 3px;
+        }
+        body {
+            background: #0a121a;
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            transition: all 0.3s ease;
+        }
+        [dir="rtl"] .fa-arrow-right {
+            transform: rotate(180deg);
+        }
+        [dir="rtl"] .fa-arrow-left {
+            transform: rotate(180deg);
+        }
+        [dir="rtl"] .fa-chevron-right {
+            transform: rotate(180deg);
+        }
+        [dir="rtl"] .fa-chevron-left {
+            transform: rotate(180deg);
+        }
+        .glass-card {
+            background: rgba(20, 30, 43, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+        }
+        .gold-border {
+            border: 1px solid rgba(212, 167, 44, 0.3);
+            box-shadow: 0 0 20px rgba(212, 167, 44, 0.08), inset 0 1px 0 rgba(212, 167, 44, 0.05);
+        }
+        .emerald-glow {
+            box-shadow: 0 0 30px rgba(46, 168, 95, 0.15), 0 0 60px rgba(46, 168, 95, 0.05);
+        }
+        .slide-up {
+            animation: slideUp 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes pulse-gold {
+            0%,
+            100% {
+                box-shadow: 0 0 5px rgba(212, 167, 44, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(212, 167, 44, 0.7), 0 0 50px rgba(212, 167, 44, 0.3);
+            }
+        }
+        .pulse-alert {
+            animation: pulse-gold 2s infinite;
+        }
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .stat-card {
+            transition: all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 30px rgba(46, 168, 95, 0.1);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, rgba(46, 168, 95, 0.2), rgba(212, 167, 44, 0.1));
+            border-bottom: 2px solid #d4a72c;
+            color: #d4a72c;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            animation: slideInRight 0.4s ease, fadeOutRight 0.4s ease 3s forwards;
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-height: 350px;
+        }
+    </style>
+</head>
+<body class="bg-surface-dark min-h-screen text-gray-200">
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- Onboarding Overlay -->
+    <div id="onboarding-overlay" class="fixed inset-0 z-[100] flex items-center justify-center modal-overlay transition-opacity duration-500">
+        <div class="glass-card gold-border rounded-2xl p-8 max-w-lg w-full mx-4 slide-up text-center relative">
+            <div class="text-5xl mb-4">💎</div>
+            <h2 class="text-3xl font-bold text-gold-400 mb-2" data-i18n="welcome_title">Welcome to FilsX</h2>
+            <p class="text-gray-400 mb-6" data-i18n="welcome_subtitle">Your Intelligent Financial Command Center</p>
+            <div class="space-y-4 text-left">
+                <label class="block text-sm text-gold-300 font-semibold uppercase tracking-wider" data-i18n="select_persona">Select Your Persona</label>
+                <div class="grid grid-cols-3 gap-3" id="persona-selector">
+                    <button data-persona="employee" class="persona-btn p-4 rounded-xl border border-surface-border hover:border-gold-500 bg-surface-hover transition-all duration-300 flex flex-col items-center gap-2">
+                        <i class="fas fa-user-tie text-2xl text-emerald-400"></i>
+                        <span class="text-xs font-semibold text-gray-300" data-i18n="persona_employee">Standard Employee</span>
+                    </button>
+                    <button data-persona="solo" class="persona-btn p-4 rounded-xl border border-surface-border hover:border-gold-500 bg-surface-hover transition-all duration-300 flex flex-col items-center gap-2">
+                        <i class="fas fa-laptop-code text-2xl text-emerald-400"></i>
+                        <span class="text-xs font-semibold text-gray-300" data-i18n="persona_solo">Solo Project Owner</span>
+                    </button>
+                    <button data-persona="business" class="persona-btn p-4 rounded-xl border border-surface-border hover:border-gold-500 bg-surface-hover transition-all duration-300 flex flex-col items-center gap-2">
+                        <i class="fas fa-building text-2xl text-emerald-400"></i>
+                        <span class="text-xs font-semibold text-gray-300" data-i18n="persona_business">Business Owner</span>
+                    </button>
+                </div>
+                <div id="budget-setup" class="hidden mt-4">
+                    <label class="block text-sm text-gold-300 font-semibold uppercase tracking-wider mb-2" data-i18n="monthly_budget_label">Initial Monthly Budget</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="initial-budget" placeholder="e.g. 5000" class="flex-1 bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500 transition-all">
+                        <select id="initial-currency" class="bg-surface-darker border border-surface-border rounded-xl px-3 py-3 text-white focus:outline-none focus:border-gold-500">
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="MAD">MAD</option>
+                            <option value="GBP">GBP</option>
+                            <option value="AED">AED</option>
+                        </select>
+                    </div>
+                    <button id="complete-onboarding" class="mt-4 w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg emerald-glow">
+                        <span data-i18n="get_started">🚀 Get Started</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Layout -->
+    <div id="main-app" class="hidden min-h-screen flex flex-col">
+        <!-- Top Navigation Bar -->
+        <nav class="glass-card sticky top-0 z-50 border-b border-surface-border px-4 py-3 flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-gold-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">F</div>
+                <span class="text-xl font-bold text-gold-400 tracking-wide">FilsX</span>
+                <span id="persona-badge" class="text-xs px-3 py-1 rounded-full bg-emerald-900/60 text-emerald-300 border border-emerald-700/40 hidden"></span>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+                <select id="currency-switcher" class="bg-surface-darker border border-surface-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-gold-500 cursor-pointer">
+                    <option value="USD">💵 USD</option>
+                    <option value="EUR">💶 EUR</option>
+                    <option value="MAD">🇲🇦 MAD</option>
+                    <option value="GBP">💷 GBP</option>
+                    <option value="AED">🇦🇪 AED</option>
+                </select>
+                <select id="language-switcher" class="bg-surface-darker border border-surface-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-gold-500 cursor-pointer">
+                    <option value="en">🇬🇧 English</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                </select>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-surface-hover hover:bg-surface-border transition-colors text-gold-400" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button onclick="openSettingsModal()" class="p-2 rounded-lg bg-surface-hover hover:bg-surface-border transition-colors text-gold-400" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Dashboard Tabs -->
+        <div class="flex overflow-x-auto border-b border-surface-border bg-surface-darker/50 sticky top-[73px] z-40" id="tab-nav">
+            <button class="tab-btn tab-active px-5 py-3 text-sm font-semibold whitespace-nowrap transition-all" data-tab="dashboard">
+                <i class="fas fa-chart-pie mr-1"></i> <span data-i18n="tab_dashboard">Dashboard</span>
+            </button>
+            <button class="tab-btn px-5 py-3 text-sm font-semibold whitespace-nowrap transition-all text-gray-400 hover:text-gold-400" data-tab="transactions">
+                <i class="fas fa-exchange-alt mr-1"></i> <span data-i18n="tab_transactions">Transactions</span>
+            </button>
+            <button class="tab-btn px-5 py-3 text-sm font-semibold whitespace-nowrap transition-all text-gray-400 hover:text-gold-400" data-tab="credits">
+                <i class="fas fa-hand-holding-usd mr-1"></i> <span data-i18n="tab_credits">Credit & Debt</span>
+            </button>
+            <button class="tab-btn px-5 py-3 text-sm font-semibold whitespace-nowrap transition-all text-gray-400 hover:text-gold-400" data-tab="payroll" id="payroll-tab-btn" style="display:none;">
+                <i class="fas fa-users mr-1"></i> <span data-i18n="tab_payroll">Payroll</span>
+            </button>
+            <button class="tab-btn px-5 py-3 text-sm font-semibold whitespace-nowrap transition-all text-gray-400 hover:text-gold-400" data-tab="reports">
+                <i class="fas fa-robot mr-1"></i> <span data-i18n="tab_reports">AI Reports</span>
+            </button>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-4 md:p-6 overflow-y-auto" id="main-content">
+            <!-- Dashboard Tab -->
+            <div id="tab-dashboard" class="tab-content space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card stat-card rounded-2xl p-5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs uppercase tracking-wider text-gray-500" data-i18n="stat_budget">Monthly Budget</span>
+                            <i class="fas fa-wallet text-emerald-400 text-lg"></i>
+                        </div>
+                        <p class="text-2xl font-bold text-white mt-2" id="stat-budget">$0.00</p>
+                        <span class="text-xs text-emerald-400" data-i18n="stat_active">Active</span>
+                    </div>
+                    <div class="glass-card stat-card rounded-2xl p-5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs uppercase tracking-wider text-gray-500" data-i18n="stat_income">Total Income</span>
+                            <i class="fas fa-arrow-up text-green-400 text-lg"></i>
+                        </div>
+                        <p class="text-2xl font-bold text-green-400 mt-2" id="stat-income">$0.00</p>
+                        <span class="text-xs text-green-400" id="stat-income-count">0 entries</span>
+                    </div>
+                    <div class="glass-card stat-card rounded-2xl p-5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs uppercase tracking-wider text-gray-500" data-i18n="stat_expenses">Total Expenses</span>
+                            <i class="fas fa-arrow-down text-red-400 text-lg"></i>
+                        </div>
+                        <p class="text-2xl font-bold text-red-400 mt-2" id="stat-expenses">$0.00</p>
+                        <span class="text-xs text-red-400" id="stat-expense-count">0 entries</span>
+                    </div>
+                    <div class="glass-card stat-card rounded-2xl p-5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs uppercase tracking-wider text-gray-500" data-i18n="stat_balance">Net Balance</span>
+                            <i class="fas fa-balance-scale text-gold-400 text-lg"></i>
+                        </div>
+                        <p class="text-2xl font-bold text-gold-400 mt-2" id="stat-balance">$0.00</p>
+                        <span class="text-xs" id="stat-balance-label">—</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-card rounded-2xl p-5">
+                        <h3 class="text-lg font-semibold text-gold-400 mb-4" data-i18n="chart_income_expense">Income vs Expenses</h3>
+                        <div class="chart-container"><canvas id="chart-bar"></canvas></div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5">
+                        <h3 class="text-lg font-semibold text-gold-400 mb-4" data-i18n="chart_distribution">Distribution</h3>
+                        <div class="chart-container"><canvas id="chart-doughnut"></canvas></div>
+                    </div>
+                </div>
+                <div class="glass-card rounded-2xl p-5" id="credit-alert-banner" style="display:none;">
+                    <div class="flex items-center gap-3 pulse-alert rounded-xl p-4 bg-yellow-900/20 border border-yellow-700/40">
+                        <i class="fas fa-exclamation-triangle text-yellow-400 text-2xl"></i>
+                        <div>
+                            <p class="font-semibold text-yellow-300" data-i18n="alert_credit_reminder">⏰ Credit Check Reminder</p>
+                            <p class="text-sm text-gray-400" data-i18n="alert_credit_desc">You have pending credits/debts. Please review and settle them.</p>
+                        </div>
+                        <button onclick="switchTab('credits')" class="ml-auto px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg text-sm font-semibold transition-all" data-i18n="review_now">Review Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Tab -->
+            <div id="tab-transactions" class="tab-content hidden space-y-6">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <h2 class="text-2xl font-bold text-gold-400" data-i18n="transaction_tracker">Transaction Tracker</h2>
+                    <button onclick="openTransactionModal()" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold py-2.5 px-5 rounded-xl transition-all shadow-lg flex items-center gap-2">
+                        <i class="fas fa-plus"></i> <span data-i18n="add_transaction">Add Transaction</span>
+                    </button>
+                </div>
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-surface-darker text-gold-400 uppercase text-xs tracking-wider">
+                                <tr>
+                                    <th class="py-3 px-4 text-left" data-i18n="th_title">Title</th>
+                                    <th class="py-3 px-4 text-left" data-i18n="th_type">Type</th>
+                                    <th class="py-3 px-4 text-left" data-i18n="th_amount">Amount</th>
+                                    <th class="py-3 px-4 text-left" data-i18n="th_date">Date & Time</th>
+                                    <th class="py-3 px-4 text-left" data-i18n="th_location">Location</th>
+                                    <th class="py-3 px-4 text-left" data-i18n="th_why">Why</th>
+                                    <th class="py-3 px-4 text-center" data-i18n="th_actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-table-body" class="divide-y divide-surface-border"></tbody>
+                        </table>
+                    </div>
+                    <div id="no-transactions" class="text-center py-12 text-gray-500">
+                        <i class="fas fa-inbox text-4xl mb-3"></i>
+                        <p data-i18n="no_transactions">No transactions yet. Start logging your financial activity.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credits Tab -->
+            <div id="tab-credits" class="tab-content hidden space-y-6">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <h2 class="text-2xl font-bold text-gold-400" data-i18n="credit_debt_book">Credit & Debt Book</h2>
+                    <button onclick="openCreditModal()" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold py-2.5 px-5 rounded-xl transition-all shadow-lg flex items-center gap-2">
+                        <i class="fas fa-plus"></i> <span data-i18n="add_credit">Add Entry</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-card rounded-2xl p-5">
+                        <h3 class="text-lg font-semibold text-red-400 mb-3" data-i18n="money_owed_by_you">💸 Money You Owe Others</h3>
+                        <div id="debts-list" class="space-y-3"></div>
+                        <p id="no-debts" class="text-gray-500 text-sm text-center py-6" data-i18n="no_debts">No debts recorded.</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5">
+                        <h3 class="text-lg font-semibold text-green-400 mb-3" data-i18n="money_owed_to_you">💰 Money Others Owe You</h3>
+                        <div id="credits-list" class="space-y-3"></div>
+                        <p id="no-credits-receivable" class="text-gray-500 text-sm text-center py-6" data-i18n="no_credits_receivable">No credits receivable.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payroll Tab -->
+            <div id="tab-payroll" class="tab-content hidden space-y-6">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <h2 class="text-2xl font-bold text-gold-400" data-i18n="payroll_manager">Payroll & Employee Manager</h2>
+                    <button onclick="openEmployeeModal()" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold py-2.5 px-5 rounded-xl transition-all shadow-lg flex items-center gap-2">
+                        <i class="fas fa-user-plus"></i> <span data-i18n="add_employee">Add Employee</span>
+                    </button>
+                </div>
+                <div id="employees-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <p id="no-employees" class="text-gray-500 text-center py-12" data-i18n="no_employees">No employees added yet.</p>
+            </div>
+
+            <!-- Reports Tab -->
+            <div id="tab-reports" class="tab-content hidden space-y-6">
+                <h2 class="text-2xl font-bold text-gold-400" data-i18n="ai_reports">🤖 AI-Generated Monthly Reports</h2>
+                <div class="glass-card rounded-2xl p-5">
+                    <p class="text-sm text-gray-400 mb-3" data-i18n="auto_report_info">Automated reports are generated on the last day of each month via the Gemini AI engine. Zero human intervention required.</p>
+                    <button onclick="triggerManualReport()" class="bg-gold-600 hover:bg-gold-500 text-navy-950 font-bold py-2.5 px-5 rounded-xl transition-all shadow-lg">
+                        <i class="fas fa-sync-alt mr-2"></i> <span data-i18n="generate_report_now">Generate Report Now (Demo)</span>
+                    </button>
+                    <div id="reports-container" class="mt-6 space-y-4"></div>
+                    <p id="no-reports" class="text-gray-500 text-center py-8" data-i18n="no_reports">No reports generated yet.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="border-t border-surface-border py-3 px-4 text-center text-xs text-gray-600 bg-surface-darker/30">
+            <span>FilsX © 2026 — Enterprise Financial Command Center</span>
+            <span class="mx-2">|</span>
+            <span id="cron-status" class="text-emerald-500">⏳ Cron: Monitoring end-of-month...</span>
+        </footer>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="transaction-modal" class="fixed inset-0 z-[200] hidden items-center justify-center modal-overlay">
+        <div class="glass-card gold-border rounded-2xl p-6 max-w-lg w-full mx-4 slide-up max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-gold-400 mb-4" id="transaction-modal-title" data-i18n="add_transaction">Add Transaction</h3>
+            <form id="transaction-form" class="space-y-4">
+                <input type="hidden" id="tx-edit-id">
+                <input type="text" id="tx-title" placeholder="Title" required class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500">
+                <select id="tx-type" class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold-500">
+                    <option value="income">💰 Income</option>
+                    <option value="expense">📤 Expense</option>
+                </select>
+                <input type="number" id="tx-amount" placeholder="Amount" step="0.01" required class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500">
+                <input type="datetime-local" id="tx-datetime" class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold-500">
+                <input type="text" id="tx-location" placeholder="Location / Platform" class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500">
+                <textarea id="tx-why" placeholder="Why? Reason / Notes" rows="3" class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500 resize-none"></textarea>
+                <div class="flex gap-3">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold py-3 rounded-xl transition-all shadow-lg" data-i18n="save">Save</button>
+                    <button type="button" onclick="closeTransactionModal()" class="flex-1 bg-surface-hover hover:bg-surface-border text-gray-300 font-bold py-3 rounded-xl transition-all" data-i18n="cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Credit Modal -->
+    <div id="credit-modal" class="fixed inset-0 z-[200] hidden items-center justify-center modal-overlay">
+        <div class="glass-card gold-border rounded-2xl p-6 max-w-lg w-full mx-4 slide-up">
+            <h3 class="text-xl font-bold text-gold-400 mb-4" id="credit-modal-title" data-i18n="add_credit_entry">Add Credit/Debt Entry</h3>
+            <form id="credit-form" class="space-y-4">
+                <input type="hidden" id="cr-edit-id">
+                <input type="text" id="cr-person" placeholder="Person / Entity Name" required class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500">
+                <select id="cr-direction" class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold-500">
+                    <option value="owe_them">💸 I Owe Them (Debt)</option>
+                    <option value="they_owe_me">💰 They Owe Me (Credit)</option>
+                </select>
+                <input type="number" id="cr-amount" placeholder="Amount" step="0.01" required class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500">
+                <textarea id="cr-notes" placeholder="Notes / Reason" rows="2" class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500 resize-none"></textarea>
+                <div class="flex gap-3">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold py-3 rounded-xl transition-all shadow-lg" data-i18n="save">Save</button>
+                    <button type="button" onclick="closeCreditModal()" class="flex-1 bg-surface-hover hover:bg-surface-border text-gray-300 font-bold py-3 rounded-xl transition-all" data-i18n="cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Employee Modal -->
+    <div id="employee-modal" class="fixed inset-0 z-[200] hidden items-center justify-center modal-overlay">
+        <div class="glass-card gold-border rounded-2xl p-6 max-w-lg w-full mx-4 slide-up">
+            <h3 class="text-xl font-bold text-gold-400 mb-4" id="employee-modal-title" data-i18n="add_employee">Add Employee</h3>
+            <form id="employee-form" class="space-y-4">
+                <input type="hidden" id="emp-edit-id">
+                <input type="text" id="emp-name" placeholder="Employee Name" required class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500">
+                <input type="number" id="emp-salary" placeholder="Monthly Salary" step="0.01" required class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500">
+                <select id="emp-performance" class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold-500">
+                    <option value="excellent">⭐ Excellent</option>
+                    <option value="good">👍 Good</option>
+                    <option value="average">👌 Average</option>
+                    <option value="poor">⚠️ Poor</option>
+                </select>
+                <div class="flex gap-3">
+                    <button type="submit" class="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold py-3 rounded-xl transition-all shadow-lg" data-i18n="save">Save</button>
+                    <button type="button" onclick="closeEmployeeModal()" class="flex-1 bg-surface-hover hover:bg-surface-border text-gray-300 font-bold py-3 rounded-xl transition-all" data-i18n="cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-[200] hidden items-center justify-center modal-overlay">
+        <div class="glass-card gold-border rounded-2xl p-6 max-w-md w-full mx-4 slide-up">
+            <h3 class="text-xl font-bold text-gold-400 mb-4">⚙️ Settings</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm text-gray-400">Telegram Bot Token (for alerts)</label>
+                    <input type="text" id="setting-telegram-token" placeholder="Bot Token" class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500 mt-1">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-400">Telegram Chat ID</label>
+                    <input type="text" id="setting-telegram-chatid" placeholder="Chat ID" class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500 mt-1">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-400">Gemini API Key (for AI reports)</label>
+                    <input type="text" id="setting-gemini-key" placeholder="AI API Key" class="w-full bg-surface-darker border border-surface-border rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-gold-500 mt-1">
+                </div>
+                <button onclick="saveSettings()" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold py-3 rounded-xl transition-all shadow-lg">Save Settings</button>
+                <button onclick="closeSettingsModal()" class="w-full bg-surface-hover hover:bg-surface-border text-gray-300 font-bold py-3 rounded-xl transition-all">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== FilsX Core Application ====================
+        (function() {
+            // ──────────────── STATE ────────────────
+            const APP_KEY = 'filsx_data_v2';
+            let appState = {
+                persona: null,
+                budget: 0,
+                currency: 'USD',
+                language: 'en',
+                transactions: [],
+                credits: [], // {id, person, direction:'owe_them'|'they_owe_me', amount, notes, settled:false, createdAt}
+                employees: [], // {id, name, salary, performance, createdAt}
+                reports: [], // {id, date, content, type:'profit'|'loss'}
+                settings: { telegramToken: '', telegramChatId: '', geminiKey: '' },
+                lastCreditAlert: null,
+                darkMode: true,
+            };
+
+            function loadState() {
+                try {
+                    const saved = localStorage.getItem(APP_KEY);
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        appState = { ...appState, ...parsed };
+                    }
+                } catch (e) { console.warn('State load failed:', e); }
+            }
+
+            function saveState() {
+                try {
+                    localStorage.setItem(APP_KEY, JSON.stringify(appState));
+                } catch (e) { console.warn('State save failed:', e); }
+            }
+
+            loadState();
+
+            // ──────────────── I18N ────────────────
+            const translations = {
+                en: {
+                    welcome_title: 'Welcome to FilsX',
+                    welcome_subtitle: 'Your Intelligent Financial Command Center',
+                    select_persona: 'Select Your Persona',
+                    persona_employee: 'Standard Employee',
+                    persona_solo: 'Solo Project Owner',
+                    persona_business: 'Business Owner',
+                    monthly_budget_label: 'Initial Monthly Budget',
+                    get_started: '🚀 Get Started',
+                    tab_dashboard: 'Dashboard',
+                    tab_transactions: 'Transactions',
+                    tab_credits: 'Credit & Debt',
+                    tab_payroll: 'Payroll',
+                    tab_reports: 'AI Reports',
+                    stat_budget: 'Monthly Budget',
+                    stat_active: 'Active',
+                    stat_income: 'Total Income',
+                    stat_expenses: 'Total Expenses',
+                    stat_balance: 'Net Balance',
+                    chart_income_expense: 'Income vs Expenses',
+                    chart_distribution: 'Distribution',
+                    alert_credit_reminder: '⏰ Credit Check Reminder',
+                    alert_credit_desc: 'You have pending credits/debts. Please review and settle them.',
+                    review_now: 'Review Now',
+                    transaction_tracker: 'Transaction Tracker',
+                    add_transaction: 'Add Transaction',
+                    th_title: 'Title',
+                    th_type: 'Type',
+                    th_amount: 'Amount',
+                    th_date: 'Date & Time',
+                    th_location: 'Location',
+                    th_why: 'Why',
+                    th_actions: 'Actions',
+                    no_transactions: 'No transactions yet. Start logging your financial activity.',
+                    credit_debt_book: 'Credit & Debt Book',
+                    add_credit: 'Add Entry',
+                    money_owed_by_you: '💸 Money You Owe Others',
+                    money_owed_to_you: '💰 Money Others Owe You',
+                    no_debts: 'No debts recorded.',
+                    no_credits_receivable: 'No credits receivable.',
+                    payroll_manager: 'Payroll & Employee Manager',
+                    add_employee: 'Add Employee',
+                    no_employees: 'No employees added yet.',
+                    ai_reports: '🤖 AI-Generated Monthly Reports',
+                    auto_report_info: 'Automated reports are generated on the last day of each month via the Gemini AI engine.',
+                    generate_report_now: 'Generate Report Now (Demo)',
+                    no_reports: 'No reports generated yet.',
+                    save: 'Save',
+                    cancel: 'Cancel',
+                    add_credit_entry: 'Add Credit/Debt Entry',
+                    edit: 'Edit',
+                    delete: 'Delete',
+                    settle: 'Settle',
+                    settled: 'Settled',
+                    profit: 'PROFIT',
+                    loss: 'LOSS',
+                    salary_optimization: 'Salary Optimization Suggestion',
+                    overpaid_warning: '⚠️ This employee may be overpaid relative to performance.',
+                },
+                fr: {
+                    welcome_title: 'Bienvenue sur FilsX',
+                    welcome_subtitle: 'Votre Centre de Commandement Financier Intelligent',
+                    select_persona: 'Sélectionnez Votre Profil',
+                    persona_employee: 'Employé Standard',
+                    persona_solo: 'Propriétaire de Projet Solo',
+                    persona_business: "Chef d'Entreprise",
+                    monthly_budget_label: 'Budget Mensuel Initial',
+                    get_started: '🚀 Commencer',
+                    tab_dashboard: 'Tableau de Bord',
+                    tab_transactions: 'Transactions',
+                    tab_credits: 'Crédit & Dette',
+                    tab_payroll: 'Paie',
+                    tab_reports: 'Rapports IA',
+                    stat_budget: 'Budget Mensuel',
+                    stat_active: 'Actif',
+                    stat_income: 'Revenu Total',
+                    stat_expenses: 'Dépenses Totales',
+                    stat_balance: 'Solde Net',
+                    chart_income_expense: 'Revenus vs Dépenses',
+                    chart_distribution: 'Distribution',
+                    alert_credit_reminder: '⏰ Rappel de Crédit',
+                    alert_credit_desc: 'Vous avez des crédits/dettes en attente. Veuillez les régler.',
+                    review_now: 'Examiner',
+                    transaction_tracker: 'Suivi des Transactions',
+                    add_transaction: 'Ajouter Transaction',
+                    th_title: 'Titre',
+                    th_type: 'Type',
+                    th_amount: 'Montant',
+                    th_date: 'Date & Heure',
+                    th_location: 'Lieu',
+                    th_why: 'Pourquoi',
+                    th_actions: 'Actions',
+                    no_transactions: 'Aucune transaction. Commencez à enregistrer.',
+                    credit_debt_book: 'Livre de Crédits & Dettes',
+                    add_credit: 'Ajouter Entrée',
+                    money_owed_by_you: '💸 Argent Que Vous Devez',
+                    money_owed_to_you: "💰 Argent Qu'on Vous Doit",
+                    no_debts: 'Aucune dette enregistrée.',
+                    no_credits_receivable: 'Aucun crédit à recevoir.',
+                    payroll_manager: 'Gestionnaire de Paie',
+                    add_employee: 'Ajouter Employé',
+                    no_employees: "Aucun employé ajouté.",
+                    ai_reports: '🤖 Rapports Mensuels IA',
+                    auto_report_info: 'Les rapports sont générés automatiquement le dernier jour du mois.',
+                    generate_report_now: 'Générer Rapport (Démo)',
+                    no_reports: 'Aucun rapport généré.',
+                    save: 'Enregistrer',
+                    cancel: 'Annuler',
+                    add_credit_entry: 'Ajouter Crédit/Dette',
+                    edit: 'Modifier',
+                    delete: 'Supprimer',
+                    settle: 'Régler',
+                    settled: 'Réglé',
+                    profit: 'BÉNÉFICE',
+                    loss: 'PERTE',
+                    salary_optimization: "Suggestion d'Optimisation Salariale",
+                    overpaid_warning: '⚠️ Cet employé est peut-être surpayé par rapport à sa performance.',
+                },
+                ar: {
+                    welcome_title: 'مرحباً بك في FilsX',
+                    welcome_subtitle: 'مركز القيادة المالية الذكي الخاص بك',
+                    select_persona: 'اختر ملفك الشخصي',
+                    persona_employee: 'موظف عادي',
+                    persona_solo: 'صاحب مشروع فردي',
+                    persona_business: 'صاحب عمل مع موظفين',
+                    monthly_budget_label: 'الميزانية الشهرية الأولية',
+                    get_started: '🚀 ابدأ',
+                    tab_dashboard: 'لوحة التحكم',
+                    tab_transactions: 'المعاملات',
+                    tab_credits: 'الائتمان والديون',
+                    tab_payroll: 'الرواتب',
+                    tab_reports: 'تقارير الذكاء الاصطناعي',
+                    stat_budget: 'الميزانية الشهرية',
+                    stat_active: 'نشط',
+                    stat_income: 'إجمالي الدخل',
+                    stat_expenses: 'إجمالي المصروفات',
+                    stat_balance: 'الرصيد الصافي',
+                    chart_income_expense: 'الدخل مقابل المصروفات',
+                    chart_distribution: 'التوزيع',
+                    alert_credit_reminder: '⏰ تذكير بمراجعة الائتمان',
+                    alert_credit_desc: 'لديك ائتمانات/ديون معلقة. يرجى مراجعتها وتسويتها.',
+                    review_now: 'راجع الآن',
+                    transaction_tracker: 'متتبع المعاملات',
+                    add_transaction: 'إضافة معاملة',
+                    th_title: 'العنوان',
+                    th_type: 'النوع',
+                    th_amount: 'المبلغ',
+                    th_date: 'التاريخ والوقت',
+                    th_location: 'الموقع',
+                    th_why: 'السبب',
+                    th_actions: 'الإجراءات',
+                    no_transactions: 'لا توجد معاملات. ابدأ بتسجيل نشاطك المالي.',
+                    credit_debt_book: 'سجل الائتمان والديون',
+                    add_credit: 'إضافة إدخال',
+                    money_owed_by_you: '💸 الأموال التي تدين بها',
+                    money_owed_to_you: '💰 الأموال التي يدين بها الآخرون لك',
+                    no_debts: 'لا توجد ديون مسجلة.',
+                    no_credits_receivable: 'لا توجد ائتمانات مستحقة.',
+                    payroll_manager: 'مدير الرواتب والموظفين',
+                    add_employee: 'إضافة موظف',
+                    no_employees: 'لم تتم إضافة موظفين بعد.',
+                    ai_reports: '🤖 التقارير الشهرية بالذكاء الاصطناعي',
+                    auto_report_info: 'يتم إنشاء التقارير تلقائياً في اليوم الأخير من كل شهر.',
+                    generate_report_now: 'إنشاء تقرير الآن (تجريبي)',
+                    no_reports: 'لم يتم إنشاء تقارير بعد.',
+                    save: 'حفظ',
+                    cancel: 'إلغاء',
+                    add_credit_entry: 'إضافة إدخال ائتمان/دين',
+                    edit: 'تعديل',
+                    delete: 'حذف',
+                    settle: 'تسوية',
+                    settled: 'تمت التسوية',
+                    profit: 'ربح',
+                    loss: 'خسارة',
+                    salary_optimization: 'اقتراح تحسين الراتب',
+                    overpaid_warning: '⚠️ قد يكون هذا الموظف يتقاضى أجراً زائداً مقارنة بأدائه.',
+                }
+            };
+
+            function t(key) {
+                const lang = appState.language || 'en';
+                return (translations[lang] && translations[lang][key]) ? translations[lang][key] :
+                    (translations['en'][key] || key);
+            }
+
+            function applyTranslations() {
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    el.textContent = t(key);
+                });
+                document.querySelectorAll('[placeholder][data-i18n-placeholder]').forEach(el => {
+                    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+                });
+            }
+
+            function setLanguage(lang) {
+                appState.language = lang;
+                document.documentElement.lang = lang;
+                document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+                saveState();
+                applyTranslations();
+                updateDashboardStats();
+                renderAll();
+            }
+
+            // ──────────────── CURRENCY ────────────────
+            const exchangeRates = { USD: 1, EUR: 0.92, MAD: 9.95, GBP: 0.79, AED: 3.67 };
+
+            function formatCurrency(amount, currencyOverride) {
+                const curr = currencyOverride || appState.currency || 'USD';
+                const symbols = { USD: '$', EUR: '€', MAD: 'MAD ', GBP: '£', AED: 'AED ' };
+                const sym = symbols[curr] || '$';
+                const formatted = Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2,
+                    maximumFractionDigits: 2 });
+                return amount < 0 ? `-${sym}${formatted}` : `${sym}${formatted}`;
+            }
+
+            function convertAmount(amount, fromCurr, toCurr) {
+                if (fromCurr === toCurr) return amount;
+                const inUSD = amount / (exchangeRates[fromCurr] || 1);
+                return inUSD * (exchangeRates[toCurr] || 1);
+            }
+
+            function setCurrency(curr) {
+                appState.currency = curr;
+                document.getElementById('currency-switcher').value = curr;
+                saveState();
+                updateDashboardStats();
+                renderAll();
+            }
+
+            // ──────────────── TOASTS ────────────────
+            function showToast(message, type = 'info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                const colors = { success: 'bg-emerald-700 border-emerald-400', error: 'bg-red-700 border-red-400',
+                    info: 'bg-navy-700 border-gold-400', warning: 'bg-yellow-700 border-yellow-400' };
+                toast.className =
+                    `toast ${colors[type]||colors.info} border text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-semibold pointer-events-auto`;
+                toast.textContent = message;
+                container.appendChild(toast);
+                setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
+            }
+
+            // ──────────────── DARK MODE ────────────────
+            function toggleDarkMode() {
+                appState.darkMode = !appState.darkMode;
+                document.documentElement.classList.toggle('dark', appState.darkMode);
+                if (!appState.darkMode) {
+                    document.body.style.background = '#f0f4f8';
+                    document.body.style.color = '#1a202c';
+                } else {
+                    document.body.style.background = '#0a121a';
+                    document.body.style.color = '#e2e8f0';
+                }
+                saveState();
+            }
+
+            // ──────────────── ONBOARDING ────────────────
+            function initOnboarding() {
+                if (appState.persona && appState.budget > 0) {
+                    document.getElementById('onboarding-overlay').style.display = 'none';
+                    document.getElementById('main-app').classList.remove('hidden');
+                    document.getElementById('persona-badge').classList.remove('hidden');
+                    const badgeLabels = { employee: t('persona_employee'), solo: t('persona_solo'),
+                        business: t('persona_business') };
+                    document.getElementById('persona-badge').textContent = badgeLabels[appState.persona] || '';
+                    if (appState.persona === 'business') {
+                        document.getElementById('payroll-tab-btn').style.display = 'inline-block';
+                    }
+                    document.getElementById('currency-switcher').value = appState.currency;
+                    document.getElementById('language-switcher').value = appState.language;
+                    setLanguage(appState.language);
+                    updateDashboardStats();
+                    renderAll();
+                    initCharts();
+                    checkCreditAlerts();
+                    checkEndOfMonth();
+                } else {
+                    document.getElementById('onboarding-overlay').style.display = 'flex';
+                    document.getElementById('main-app').classList.add('hidden');
+                    document.getElementById('budget-setup').classList.add('hidden');
+                }
+            }
+
+            document.querySelectorAll('.persona-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove(
+                        'border-gold-500', 'bg-gold-900/20', 'shadow-lg'));
+                    this.classList.add('border-gold-500', 'bg-gold-900/20', 'shadow-lg');
+                    appState.persona = this.getAttribute('data-persona');
+                    document.getElementById('budget-setup').classList.remove('hidden');
+                    document.getElementById('budget-setup').classList.add('slide-up');
+                    saveState();
+                });
+            });
+
+            document.getElementById('complete-onboarding').addEventListener('click', function() {
+                const budgetVal = parseFloat(document.getElementById('initial-budget').value);
+                if (!appState.persona) { showToast('Please select a persona first.', 'warning'); return; }
+                if (!budgetVal || budgetVal <= 0) { showToast('Please enter a valid budget amount.',
+                    'warning'); return; }
+                appState.budget = budgetVal;
+                appState.currency = document.getElementById('initial-currency').value;
+                saveState();
+                initOnboarding();
+                showToast('Welcome to FilsX! 🎉', 'success');
+            });
+
+            // ──────────────── TAB SWITCHING ────────────────
+            function switchTab(tabName) {
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
+                document.querySelectorAll('.tab-btn').forEach(tb => { tb.classList.remove('tab-active');
+                    tb.classList.add('text-gray-400'); });
+                const targetTab = document.getElementById('tab-' + tabName);
+                if (targetTab) targetTab.classList.remove('hidden');
+                const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+                if (targetBtn) { targetBtn.classList.add('tab-active');
+                    targetBtn.classList.remove('text-gray-400'); }
+                if (tabName === 'dashboard') { updateDashboardStats();
+                    initCharts(); }
+                if (tabName === 'credits') renderCredits();
+                if (tabName === 'payroll') renderEmployees();
+                if (tabName === 'reports') renderReports();
+                if (tabName === 'transactions') renderTransactions();
+            }
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() { switchTab(this.getAttribute('data-tab')); });
+            });
+
+            // ──────────────── TRANSACTIONS CRUD ────────────────
+            function generateId() { return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9); }
+
+            function addTransaction(tx) {
+                tx.id = generateId();
+                tx.createdAt = new Date().toISOString();
+                appState.transactions.unshift(tx);
+                saveState();
+                updateDashboardStats();
+                renderTransactions();
+                initCharts();
+            }
+
+            function updateTransaction(id, updatedData) {
+                const idx = appState.transactions.findIndex(t => t.id === id);
+                if (idx >= 0) { appState.transactions[idx] = { ...appState.transactions[idx], ...updatedData }; }
+                saveState();
+                updateDashboardStats();
+                renderTransactions();
+                initCharts();
+            }
+
+            function deleteTransaction(id) {
+                appState.transactions = appState.transactions.filter(t => t.id !== id);
+                saveState();
+                updateDashboardStats();
+                renderTransactions();
+                initCharts();
+                showToast('Transaction deleted.', 'info');
+            }
+
+            function renderTransactions() {
+                const tbody = document.getElementById('transactions-table-body');
+                const noTx = document.getElementById('no-transactions');
+                tbody.innerHTML = '';
+                if (appState.transactions.length === 0) { noTx.style.display = 'block'; return; }
+                noTx.style.display = 'none';
+                appState.transactions.forEach(tx => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-surface-hover transition-colors';
+                    const typeColor = tx.type === 'income' ? 'text-green-400' : 'text-red-400';
+                    const typeIcon = tx.type === 'income' ? '📈' : '📉';
+                    row.innerHTML = `
+                <td class="py-3 px-4 font-medium">${escapeHtml(tx.title)}</td>
+                <td class="py-3 px-4 ${typeColor}">${typeIcon} ${tx.type}</td>
+                <td class="py-3 px-4 font-semibold">${formatCurrency(tx.amount)}</td>
+                <td class="py-3 px-4 text-xs text-gray-400">${tx.datetime || tx.createdAt?.slice(0,16) || '—'}</td>
+                <td class="py-3 px-4 text-xs text-gray-400">${escapeHtml(tx.location || '—')}</td>
+                <td class="py-3 px-4 text-xs text-gray-400 max-w-[150px] truncate">${escapeHtml(tx.why || '—')}</td>
+                <td class="py-3 px-4 text-center">
+                  <button onclick="window._editTransaction('${tx.id}')" class="text-blue-400 hover:text-blue-300 mr-2" title="${t('edit')}"><i class="fas fa-edit"></i></button>
+                  <button onclick="window._deleteTransaction('${tx.id}')" class="text-red-400 hover:text-red-300" title="${t('delete')}"><i class="fas fa-trash"></i></button>
+                </td>`;
+                    tbody.appendChild(row);
+                });
+            }
+
+            window._editTransaction = function(id) {
+                const tx = appState.transactions.find(t => t.id === id);
+                if (!tx) return;
+                document.getElementById('tx-edit-id').value = tx.id;
+                document.getElementById('tx-title').value = tx.title || '';
+                document.getElementById('tx-type').value = tx.type || 'expense';
+                document.getElementById('tx-amount').value = tx.amount || '';
+                document.getElementById('tx-datetime').value = tx.datetime || '';
+                document.getElementById('tx-location').value = tx.location || '';
+                document.getElementById('tx-why').value = tx.why || '';
+                document.getElementById('transaction-modal-title').textContent = 'Edit Transaction';
+                document.getElementById('transaction-modal').style.display = 'flex';
+            };
+            window._deleteTransaction = function(id) { if (confirm('Delete this transaction?'))
+                deleteTransaction(id); };
+
+            function openTransactionModal() {
+                document.getElementById('transaction-form').reset();
+                document.getElementById('tx-edit-id').value = '';
+                document.getElementById('tx-datetime').value = new Date().toISOString().slice(0, 16);
+                document.getElementById('transaction-modal-title').textContent = t('add_transaction');
+                document.getElementById('transaction-modal').style.display = 'flex';
+            }
+
+            function closeTransactionModal() { document.getElementById('transaction-modal').style.display = 'none'; }
+
+            document.getElementById('transaction-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const editId = document.getElementById('tx-edit-id').value;
+                const data = {
+                    title: document.getElementById('tx-title').value.trim(),
+                    type: document.getElementById('tx-type').value,
+                    amount: parseFloat(document.getElementById('tx-amount').value) || 0,
+                    datetime: document.getElementById('tx-datetime').value,
+                    location: document.getElementById('tx-location').value.trim(),
+                    why: document.getElementById('tx-why').value.trim(),
+                };
+                if (!data.title || data.amount <= 0) { showToast('Title and amount are required.', 'warning'); return; }
+                if (editId) { updateTransaction(editId, data);
+                    showToast('Transaction updated.', 'success'); } else { addTransaction(data);
+                    showToast('Transaction added!', 'success'); }
+                closeTransactionModal();
+                switchTab('transactions');
+            });
+
+            // ──────────────── CREDITS CRUD ────────────────
+            function addCreditEntry(entry) {
+                entry.id = generateId();
+                entry.createdAt = new Date().toISOString();
+                entry.settled = false;
+                appState.credits.unshift(entry);
+                saveState();
+                renderCredits();
+                checkCreditAlerts();
+            }
+
+            function updateCreditEntry(id, data) {
+                const idx = appState.credits.findIndex(c => c.id === id);
+                if (idx >= 0) appState.credits[idx] = { ...appState.credits[idx], ...data };
+                saveState();
+                renderCredits();
+                checkCreditAlerts();
+            }
+
+            function deleteCreditEntry(id) {
+                appState.credits = appState.credits.filter(c => c.id !== id);
+                saveState();
+                renderCredits();
+                checkCreditAlerts();
+            }
+
+            function settleCreditEntry(id) {
+                const idx = appState.credits.findIndex(c => c.id === id);
+                if (idx >= 0) { appState.credits[idx].settled = true;
+                    saveState();
+                    renderCredits();
+                    checkCreditAlerts();
+                    showToast('Entry settled ✅', 'success'); }
+            }
+
+            function renderCredits() {
+                const debtsList = document.getElementById('debts-list');
+                const creditsList = document.getElementById('credits-list');
+                const noDebts = document.getElementById('no-debts');
+                const noCreditsRec = document.getElementById('no-credits-receivable');
+                debtsList.innerHTML = '';
+                creditsList.innerHTML = '';
+                const debts = appState.credits.filter(c => c.direction === 'owe_them' && !c.settled);
+                const receivables = appState.credits.filter(c => c.direction === 'they_owe_me' && !c.settled);
+                noDebts.style.display = debts.length === 0 ? 'block' : 'none';
+                noCreditsRec.style.display = receivables.length === 0 ? 'block' : 'none';
+                const renderCard = (entry, container) => {
+                    const card = document.createElement('div');
+                    card.className =
+                        'bg-surface-darker rounded-xl p-3 flex items-center justify-between gap-2 border border-surface-border hover:border-gold-600/30 transition-all';
+                    card.innerHTML = `
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-white text-sm">${escapeHtml(entry.person)}</p>
+                  <p class="text-xs text-gray-400">${formatCurrency(entry.amount)} — ${escapeHtml(entry.notes || '')}</p>
+                </div>
+                <div class="flex gap-1 flex-shrink-0">
+                  <button onclick="window._settleCredit('${entry.id}')" class="text-xs px-2 py-1 bg-green-700 hover:bg-green-600 text-white rounded-lg" title="${t('settle')}">✓</button>
+                  <button onclick="window._deleteCredit('${entry.id}')" class="text-xs px-2 py-1 bg-red-700 hover:bg-red-600 text-white rounded-lg" title="${t('delete')}">×</button>
+                </div>`;
+                    container.appendChild(card);
+                };
+                debts.forEach(d => renderCard(d, debtsList));
+                receivables.forEach(r => renderCard(r, creditsList));
+            }
+            window._settleCredit = settleCreditEntry;
+            window._deleteCredit = deleteCreditEntry;
+
+            function openCreditModal() {
+                document.getElementById('credit-form').reset();
+                document.getElementById('cr-edit-id').value = '';
+                document.getElementById('credit-modal-title').textContent = t('add_credit_entry');
+                document.getElementById('credit-modal').style.display = 'flex';
+            }
+
+            function closeCreditModal() { document.getElementById('credit-modal').style.display = 'none'; }
+
+            document.getElementById('credit-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const data = {
+                    person: document.getElementById('cr-person').value.trim(),
+                    direction: document.getElementById('cr-direction').value,
+                    amount: parseFloat(document.getElementById('cr-amount').value) || 0,
+                    notes: document.getElementById('cr-notes').value.trim(),
+                };
+                if (!data.person || data.amount <= 0) { showToast('Person and amount required.',
+                'warning'); return; }
+                addCreditEntry(data);
+                closeCreditModal();
+                showToast('Credit entry added!', 'success');
+                switchTab('credits');
+            });
+
+            // ──────────────── CREDIT ALERT SYSTEM ────────────────
+            function checkCreditAlerts() {
+                const pending = appState.credits.filter(c => !c.settled);
+                const banner = document.getElementById('credit-alert-banner');
+                const now = Date.now();
+                const twoDays = 2 * 24 * 60 * 60 * 1000;
+                if (pending.length > 0) {
+                    if (!appState.lastCreditAlert || (now - appState.lastCreditAlert) > twoDays) {
+                        banner.style.display = 'block';
+                        appState.lastCreditAlert = now;
+                        saveState();
+                        if (appState.settings.telegramToken && appState.settings.telegramChatId) {
+                            sendTelegramAlert(
+                                `🔔 FilsX Credit Alert: You have ${pending.length} pending credit/debt entries. Please review.`
+                                );
+                        }
+                    } else if ((now - appState.lastCreditAlert) <= twoDays) {
+                        banner.style.display = 'block';
+                    }
+                } else {
+                    banner.style.display = 'none';
+                    appState.lastCreditAlert = null;
+                    saveState();
+                }
+            }
+            setInterval(checkCreditAlerts, 60000); // Check every minute
+
+            function sendTelegramAlert(message) {
+                const token = appState.settings.telegramToken;
+                const chatId = appState.settings.telegramChatId;
+                if (!token || !chatId) return;
+                fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' }),
+                    }).catch(() => { /* silent fail for demo */ });
+            }
+
+            // ──────────────── PAYROLL / EMPLOYEES ────────────────
+            function addEmployee(emp) {
+                emp.id = generateId();
+                emp.createdAt = new Date().toISOString();
+                appState.employees.unshift(emp);
+                saveState();
+                renderEmployees();
+            }
+
+            function updateEmployee(id, data) {
+                const idx = appState.employees.findIndex(e => e.id === id);
+                if (idx >= 0) appState.employees[idx] = { ...appState.employees[idx], ...data };
+                saveState();
+                renderEmployees();
+            }
+
+            function deleteEmployee(id) {
+                appState.employees = appState.employees.filter(e => e.id !== id);
+                saveState();
+                renderEmployees();
+            }
+
+            function evaluateEmployeePerformance(emp) {
+                const perfScores = { excellent: 1.3, good: 1.0, average: 0.75, poor: 0.4 };
+                const score = perfScores[emp.performance] || 1.0;
+                const fairSalary = appState.budget * 0.15 * score;
+                const currentSalary = emp.salary;
+                if (currentSalary > fairSalary * 1.3) {
+                    return {
+                        warning: true,
+                        message: `${t('overpaid_warning')} Suggested: ${formatCurrency(fairSalary.toFixed(2))} (save ~${formatCurrency((currentSalary-fairSalary).toFixed(2))})`,
+                        suggestedSalary: fairSalary.toFixed(2),
+                    };
+                }
+                return { warning: false, message: '✅ Salary is aligned with performance.', suggestedSalary: null };
+            }
+
+            function renderEmployees() {
+                const list = document.getElementById('employees-list');
+                const noEmp = document.getElementById('no-employees');
+                list.innerHTML = '';
+                if (appState.employees.length === 0) { noEmp.style.display = 'block'; return; }
+                noEmp.style.display = 'none';
+                appState.employees.forEach(emp => {
+                    const evalResult = evaluateEmployeePerformance(emp);
+                    const card = document.createElement('div');
+                    card.className =
+                        'glass-card rounded-2xl p-5 border ' + (evalResult.warning ?
+                            'border-red-500/40' : 'border-surface-border');
+                    card.innerHTML = `
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-bold text-white">${escapeHtml(emp.name)}</h4>
+                  <span class="text-xs px-2 py-1 rounded-full bg-surface-border text-gray-300">${emp.performance}</span>
+                </div>
+                <p class="text-lg font-bold text-gold-400">${formatCurrency(emp.salary)}/mo</p>
+                <p class="text-xs mt-2 ${evalResult.warning?'text-red-400':'text-green-400'}">${evalResult.message}</p>
+                <div class="flex gap-2 mt-3">
+                  <button onclick="window._editEmployee('${emp.id}')" class="text-xs px-3 py-1 bg-blue-700 hover:bg-blue-600 text-white rounded-lg">${t('edit')}</button>
+                  <button onclick="window._deleteEmployee('${emp.id}')" class="text-xs px-3 py-1 bg-red-700 hover:bg-red-600 text-white rounded-lg">${t('delete')}</button>
+                </div>`;
+                    list.appendChild(card);
+                });
+            }
+            window._editEmployee = function(id) {
+                const emp = appState.employees.find(e => e.id === id);
+                if (!emp) return;
+                document.getElementById('emp-edit-id').value = emp.id;
+                document.getElementById('emp-name').value = emp.name;
+                document.getElementById('emp-salary').value = emp.salary;
+                document.getElementById('emp-performance').value = emp.performance;
+                document.getElementById('employee-modal-title').textContent = 'Edit Employee';
+                document.getElementById('employee-modal').style.display = 'flex';
+            };
+            window._deleteEmployee = function(id) { if (confirm('Delete this employee?')) deleteEmployee(
+                id); };
+
+            function openEmployeeModal() {
+                document.getElementById('employee-form').reset();
+                document.getElementById('emp-edit-id').value = '';
+                document.getElementById('employee-modal-title').textContent = t('add_employee');
+                document.getElementById('employee-modal').style.display = 'flex';
+            }
+
+            function closeEmployeeModal() { document.getElementById('employee-modal').style.display = 'none'; }
+
+            document.getElementById('employee-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const editId = document.getElementById('emp-edit-id').value;
+                const data = {
+                    name: document.getElementById('emp-name').value.trim(),
+                    salary: parseFloat(document.getElementById('emp-salary').value) || 0,
+                    performance: document.getElementById('emp-performance').value,
+                };
+                if (!data.name || data.salary <= 0) { showToast('Name and salary required.', 'warning'); return; }
+                if (editId) { updateEmployee(editId, data);
+                    showToast('Employee updated.', 'success'); } else { addEmployee(data);
+                    showToast('Employee added!', 'success'); }
+                closeEmployeeModal();
+                switchTab('payroll');
+            });
+
+            // ──────────────── AI REPORT ENGINE ────────────────
+            function generateAIReport() {
+                const totalIncome = appState.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t
+                    .amount, 0);
+                const totalExpenses = appState.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t
+                    .amount, 0);
+                const net = totalIncome - totalExpenses;
+                const isProfit = net >= 0;
+                let analysisContent = '';
+                if (isProfit) {
+                    analysisContent = `
+              📊 <b>FilsX Monthly Report — PROFITABLE</b> 🟢
+              ━━━━━━━━━━━━━━━━━━━━━
+              💰 Total Income: ${formatCurrency(totalIncome)}
+              📤 Total Expenses: ${formatCurrency(totalExpenses)}
+              📈 <b>Net Profit: ${formatCurrency(net)}</b>
+              ━━━━━━━━━━━━━━━━━━━━━
+              🚀 <b>Scaling Strategies:</b>
+              1. Reinvest ${formatCurrency(net*0.3)} into high-growth channels.
+              2. Diversify income streams with passive revenue.
+              3. Optimize operational costs by auditing subscriptions.
+              4. Consider expanding team capacity for increased output.
+              5. Build an emergency reserve of ${formatCurrency(net*0.2)}.
+              ━━━━━━━━━━━━━━━━━━━━━
+              Generated by FilsX AI Engine (Gemini) on ${new Date().toLocaleDateString()}`;
+                } else {
+                    const lossAmount = Math.abs(net);
+                    analysisContent = `
+              📊 <b>FilsX Monthly Report — LOSS</b> 🔴
+              ━━━━━━━━━━━━━━━━━━━━━
+              💰 Total Income: ${formatCurrency(totalIncome)}
+              📤 Total Expenses: ${formatCurrency(totalExpenses)}
+              📉 <b>Net Loss: ${formatCurrency(-lossAmount)}</b>
+              ━━━━━━━━━━━━━━━━━━━━━
+              🔍 <b>Root Cause Analysis:</b>
+              1. Expenses exceed income by ${((totalExpenses/(totalIncome||1))*100).toFixed(1)}%.
+              2. Review all recurring expenses for non-essentials.
+              3. Identify underperforming income channels.
+              🛠 <b>Actionable Fixes:</b>
+              1. Cut discretionary spending by at least 20%.
+              2. Negotiate better rates with vendors.
+              3. Pivot to higher-margin products/services.
+              4. Implement strict budget controls immediately.
+              5. Seek additional short-term income sources.
+              ━━━━━━━━━━━━━━━━━━━━━
+              Generated by FilsX AI Engine (Gemini) on ${new Date().toLocaleDateString()}`;
+                }
+                const report = {
+                    id: generateId(),
+                    date: new Date().toISOString(),
+                    content: analysisContent,
+                    type: isProfit ? 'profit' : 'loss',
+                    netAmount: net,
+                };
+                appState.reports.unshift(report);
+                saveState();
+                renderReports();
+                if (appState.settings.telegramToken && appState.settings.telegramChatId) {
+                    sendTelegramAlert(analysisContent.replace(/<b>/g, '*').replace(/<\/b>/g, '*').replace(/<br>/g,
+                        '\n'));
+                }
+                showToast('📊 AI Monthly Report Generated!', 'success');
+                return report;
+            }
+
+            function triggerManualReport() {
+                const report = generateAIReport();
+                switchTab('reports');
+                showToast('Report generated. Check the Reports tab.', 'success');
+            }
+
+            function renderReports() {
+                const container = document.getElementById('reports-container');
+                const noReports = document.getElementById('no-reports');
+                container.innerHTML = '';
+                if (appState.reports.length === 0) { noReports.style.display = 'block'; return; }
+                noReports.style.display = 'none';
+                appState.reports.forEach(r => {
+                    const div = document.createElement('div');
+                    div.className =
+                        'bg-surface-darker rounded-xl p-4 border border-surface-border hover:border-gold-600/30 transition-all';
+                    div.innerHTML = `
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs text-gray-400">${new Date(r.date).toLocaleString()}</span>
+                <span class="font-bold ${r.type==='profit'?'text-green-400':'text-red-400'}">${r.type==='profit'?t('profit'):t('loss')} — ${formatCurrency(r.netAmount)}</span>
+              </div>
+              <pre class="text-xs text-gray-300 whitespace-pre-wrap font-mono bg-black/20 p-3 rounded-lg max-h-60 overflow-y-auto">${escapeHtml(r.content)}</pre>
+              <button onclick="window._deleteReport('${r.id}')" class="mt-2 text-xs text-red-400 hover:text-red-300">${t('delete')} Report</button>`;
+                    container.appendChild(div);
+                });
+            }
+            window._deleteReport = function(id) {
+                appState.reports = appState.reports.filter(r => r.id !== id);
+                saveState();
+                renderReports();
+            };
+
+            // ──────────────── END-OF-MONTH CRON SIMULATION ────────────────
+            function checkEndOfMonth() {
+                const now = new Date();
+                const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                const isLastDay = now.getDate() === lastDayOfMonth.getDate();
+                const lastChecked = localStorage.getItem('filsx_last_cron_check') || '';
+                const todayStr = now.toISOString().slice(0, 10);
+                if (isLastDay && lastChecked !== todayStr && appState.transactions.length > 0) {
+                    localStorage.setItem('filsx_last_cron_check', todayStr);
+                    const report = generateAIReport();
+                    document.getElementById('cron-status').textContent = '✅ Cron: Report generated today.';
+                    document.getElementById('cron-status').className = 'text-green-400';
+                } else if (isLastDay && lastChecked === todayStr) {
+                    document.getElementById('cron-status').textContent = '✅ Cron: Already executed today.';
+                    document.getElementById('cron-status').className = 'text-green-400';
+                } else {
+                    const daysUntil = Math.ceil((lastDayOfMonth - now) / (1000 * 60 * 60 * 24));
+                    document.getElementById('cron-status').textContent =
+                        `⏳ Cron: ${daysUntil} day(s) until end-of-month report.`;
+                    document.getElementById('cron-status').className = 'text-emerald-500';
+                }
+            }
+            setInterval(checkEndOfMonth, 3600000); // Check hourly
+
+            // ──────────────── DASHBOARD STATS ────────────────
+            function updateDashboardStats() {
+                const totalIncome = appState.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t
+                    .amount, 0);
+                const totalExpenses = appState.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t
+                    .amount, 0);
+                const balance = appState.budget + totalIncome - totalExpenses;
+                document.getElementById('stat-budget').textContent = formatCurrency(appState.budget);
+                document.getElementById('stat-income').textContent = formatCurrency(totalIncome);
+                document.getElementById('stat-expenses').textContent = formatCurrency(totalExpenses);
+                document.getElementById('stat-balance').textContent = formatCurrency(balance);
+                document.getElementById('stat-income-count').textContent = appState.transactions.filter(t => t.type ===
+                    'income').length + ' entries';
+                document.getElementById('stat-expense-count').textContent = appState.transactions.filter(t => t.type ===
+                    'expense').length + ' entries';
+                const balanceLabel = document.getElementById('stat-balance-label');
+                if (balance >= 0) { balanceLabel.textContent = '✅ Healthy';
+                    balanceLabel.className = 'text-xs text-green-400'; } else { balanceLabel.textContent =
+                        '⚠️ Deficit';
+                    balanceLabel.className = 'text-xs text-red-400'; }
+            }
+
+            // ──────────────── CHARTS ────────────────
+            let barChart = null,
+                doughnutChart = null;
+
+            function initCharts() {
+                const barCtx = document.getElementById('chart-bar');
+                const doughnutCtx = document.getElementById('chart-doughnut');
+                if (!barCtx || !doughnutCtx) return;
+                const totalIncome = appState.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t
+                    .amount, 0);
+                const totalExpenses = appState.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t
+                    .amount, 0);
+                if (barChart) barChart.destroy();
+                if (doughnutChart) doughnutChart.destroy();
+                barChart = new Chart(barCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: [t('stat_income'), t('stat_expenses'), t('stat_balance')],
+                        datasets: [{
+                            label: 'Amount',
+                            data: [totalIncome, totalExpenses, appState.budget + totalIncome -
+                                totalExpenses
+                            ],
+                            backgroundColor: ['rgba(74,201,122,0.7)', 'rgba(248,113,113,0.7)',
+                                'rgba(212,167,44,0.7)'
+                            ],
+                            borderColor: ['#4cc97a', '#f87171', '#d4a72c'],
+                            borderWidth: 2,
+                            borderRadius: 8,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                            x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                        },
+                    }
+                });
+                doughnutChart = new Chart(doughnutCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Income', 'Expenses'],
+                        datasets: [{
+                            data: [totalIncome || 0.01, totalExpenses || 0.01],
+                            backgroundColor: ['rgba(74,201,122,0.8)', 'rgba(248,113,113,0.8)'],
+                            borderColor: ['#0f1923', '#0f1923'],
+                            borderWidth: 3,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8',
+                                    padding: 20 } } },
+                    }
+                });
+            }
+
+            // ──────────────── SETTINGS ────────────────
+            function openSettingsModal() { document.getElementById('settings-modal').style.display = 'flex';
+                document.getElementById('setting-telegram-token').value = appState.settings.telegramToken || '';
+                document.getElementById('setting-telegram-chatid').value = appState.settings.telegramChatId || '';
+                document.getElementById('setting-gemini-key').value = appState.settings.geminiKey || ''; }
+
+            function closeSettingsModal() { document.getElementById('settings-modal').style.display = 'none'; }
+
+            function saveSettings() {
+                appState.settings.telegramToken = document.getElementById('setting-telegram-token').value.trim();
+                appState.settings.telegramChatId = document.getElementById('setting-telegram-chatid').value.trim();
+                appState.settings.geminiKey = document.getElementById('setting-gemini-key').value.trim();
+                saveState();
+                closeSettingsModal();
+                showToast('Settings saved!', 'success');
+            }
+
+            // ──────────────── UTILS ────────────────
+            function escapeHtml(str) { const div = document.createElement('div');
+                div.textContent = str; return div.innerHTML; }
+
+            function renderAll() {
+                renderTransactions();
+                renderCredits();
+                if (appState.persona === 'business') renderEmployees();
+                renderReports();
+                updateDashboardStats();
+                if (document.getElementById('tab-dashboard') && !document.getElementById('tab-dashboard').classList
+                    .contains('hidden')) {
+                    initCharts();
+                }
+            }
+
+            // ──────────────── EVENT LISTENERS ────────────────
+            document.getElementById('currency-switcher').addEventListener('change', function() { setCurrency(this
+                    .value); });
+            document.getElementById('language-switcher').addEventListener('change', function() { setLanguage(this
+                    .value); });
+            document.getElementById('transaction-modal').addEventListener('click', function(e) { if (e.target === this)
+                    closeTransactionModal(); });
+            document.getElementById('credit-modal').addEventListener('click', function(e) { if (e.target === this)
+                    closeCreditModal(); });
+            document.getElementById('employee-modal').addEventListener('click', function(e) { if (e.target === this)
+                    closeEmployeeModal(); });
+            document.getElementById('settings-modal').addEventListener('click', function(e) { if (e.target === this)
+                    closeSettingsModal(); });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeTransactionModal();
+                    closeCreditModal();
+                    closeEmployeeModal();
+                    closeSettingsModal();
+                }
+            });
+
+            // ──────────────── INIT ────────────────
+            function init() {
+                document.documentElement.classList.toggle('dark', appState.darkMode);
+                if (!appState.darkMode) { document.body.style.background = '#f0f4f8';
+                    document.body.style.color = '#1a202c'; }
+                document.getElementById('currency-switcher').value = appState.currency;
+                document.getElementById('language-switcher').value = appState.language;
+                setLanguage(appState.language);
+                initOnboarding();
+                if (appState.persona && appState.budget > 0) {
+                    updateDashboardStats();
+                    renderAll();
+                    initCharts();
+                    checkCreditAlerts();
+                    checkEndOfMonth();
+                }
+            }
+            init();
+
+            // Expose key functions globally
+            window.switchTab = switchTab;
+            window.openTransactionModal = openTransactionModal;
+            window.closeTransactionModal = closeTransactionModal;
+            window.openCreditModal = openCreditModal;
+            window.closeCreditModal = closeCreditModal;
+            window.openEmployeeModal = openEmployeeModal;
+            window.closeEmployeeModal = closeEmployeeModal;
+            window.openSettingsModal = openSettingsModal;
+            window.closeSettingsModal = closeSettingsModal;
+            window.saveSettings = saveSettings;
+            window.toggleDarkMode = toggleDarkMode;
+            window.triggerManualReport = triggerManualReport;
+            window.formatCurrency = formatCurrency;
+
+            console.log('💎 FilsX Enterprise Financial Command Center — Initialized');
+            console.log('👤 Persona:', appState.persona || 'Not set');
+            console.log('💰 Budget:', formatCurrency(appState.budget));
+            console.log('🌐 Language:', appState.language);
+            console.log('💱 Currency:', appState.currency);
+            console.log('📊 Transactions:', appState.transactions.length);
+            console.log('💳 Credit Entries:', appState.credits.length);
+            console.log('👥 Employees:', appState.employees.length);
+            console.log('📋 Reports:', appState.reports.length);
+            console.log('⏰ Cron active: End-of-month monitoring enabled');
+            console.log('🤖 Gemini AI Engine: Ready (simulated for demo)');
+            console.log('📡 Telegram Bot: ' + (appState.settings.telegramToken ? 'Configured' : 'Not configured'));
+        })();
+    </script>
+</body>
+</html>
